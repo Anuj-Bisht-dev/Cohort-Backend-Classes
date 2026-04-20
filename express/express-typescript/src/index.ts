@@ -6,7 +6,7 @@ import { createServerApplication } from './app/index.js';
 
 async function main() {
     try {
-        const server = http.createServer();
+        const server = http.createServer(createServerApplication());
         const PORT: number = env.PORT ? +env.PORT : 8080;
         
         server.listen(PORT, () => {

@@ -9,5 +9,5 @@ export function createServerApplication(): Application {
 
     app.use('/todos', todoRouter)
 
-    return app
+    return app;
 }
