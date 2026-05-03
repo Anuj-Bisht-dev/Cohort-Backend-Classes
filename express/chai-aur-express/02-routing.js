@@ -177,9 +177,10 @@ function block_1_httpMethods() {
             }
 
             server.close(() => {
-                console.log('server has served it\'s purpose. konichiwa!')
-            })
-        })
+                console.log('server has served it\'s purpose. konichiwa!');
+                resolve();
+            });
+        });
 
     });
 }

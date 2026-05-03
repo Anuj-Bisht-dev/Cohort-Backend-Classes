@@ -64,7 +64,7 @@ function block_1_basicServer() {
 
 
                 const menuItemsRes = await fetch(`${base}/menu/41`);
-                const menuItemsData = await menuItemsRes.json();
+                const menuItemsData = await menuItemsRes.json(); // it is necessary because, it fetching data in HTTP format.
                 console.log('GET /menu items data', JSON.stringify(menuItemsData));
                 console.log('++++++++++++++++++++++++++');
 
@@ -89,10 +89,10 @@ function block_1_basicServer() {
                 console.log(err)
             }
 
-            // closes server gracefully with a message and resolve the promise 
+            // closes server gracefully with a message 
             server.close(() => {
                 console.log('block 1 is served....');
-                resolve()
+                resolve(); // resolved the promise
             })
         })
     });
@@ -224,8 +224,12 @@ async function main() {
     await block_1_basicServer();
     await block_2_response();
 
-    // forcefuly shutdown the process don't use it in actuall codebase
-    process.exit(0);
+
+    // it forcefully shutdown the process.
+    process.exit(0); // it will be good practices when we use it after all done there cleanup and grabage collection or backups then and then after that use it. 
+    // like in this cases in the end after all thing have done.
+    // why it is a good practices because the node.js might be opened some hidden file, some timers or pending async tasks.
+    // that kept event loop alive so, use it in end can be a good practice...
 }
 
 main();
