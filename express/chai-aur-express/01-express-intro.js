@@ -226,8 +226,8 @@ async function main() {
 
 
     // it forcefully shutdown the process.
-    process.exit(0); // it will be good practices when we use it after all done there cleanup and grabage collection or backups then and then after that use it. 
-    // like in this cases in the end after all thing have done.
+    process.exit(0); // it'll be good practices when we use it after all done there cleanup and grabage collection or backups. 
+    // instance in this case we used after completion of all processes.
     // why it is a good practices because the node.js might be opened some hidden file, some timers or pending async tasks.
     // that kept event loop alive so, use it in end can be a good practice...
 }
