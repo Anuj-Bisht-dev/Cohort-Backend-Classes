@@ -54,6 +54,6 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 // the timestamps is a second argument and it automatically create updatedAt & createdAt for the model
 
-export default mongoose.mode("User", userSchema);
+export default mongoose.model("User", userSchema);
 // it always convertes in database like: "User" => "users"
 // changes into lowercase and plural
