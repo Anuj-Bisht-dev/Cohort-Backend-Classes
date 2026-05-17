@@ -32,6 +32,33 @@ const register = async (name, email, password, role) => {
     return userObj;
 }
 
+const hashedToken = (token) =>
+    crypto.createHash("sha256").update(token).digest("hex");
+
+const login = async ({ email, password }) => {
+    const user = await User.findOne({ email }).select("+password");
+    if (!user) throw new ApiError.unauthorized("unvalide email or password");
+
+    // somehow we will check the password
+
+    if (!user.isVerified) {
+        throw ApiError.fobidden("please verify your email before login");
+    }
+
+    const accessToken = generateAccessToken({ id: user._id });
+    const refreshToken = generateRefreshToken({ id: user._id });
+
+    user.verificationToken = hashedToken(refreshToken);
+    await user.save({ validateBeforeSave: false });
+
+    const userObj = user.toObject();
+    delete userObj.password;
+    delete userObj.refreshToken;
+
+    return { user: userObj, accessToken, refreshToken };
+
+}
+
 register();
 
 export { register } 
