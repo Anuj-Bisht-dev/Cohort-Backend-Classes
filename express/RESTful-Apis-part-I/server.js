@@ -4,7 +4,7 @@ import { connectDB } from "./src/common/config/db.js";
 
 const PORT = process.env.PORT || 5000;
 
-const start = async () => {
+const main = async () => {
     await connectDB();
     // db call connection
 
@@ -13,7 +13,7 @@ const start = async () => {
     });
 }
 
-start().catch((error) => {
+main().catch((error) => {
     console.log('failed to start server', error);
     process.exit(1);
 })

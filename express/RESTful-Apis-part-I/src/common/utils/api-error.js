@@ -2,7 +2,7 @@ class ApiError extends Error {
     constructor(statusCode, message) {
         super(message);
         this.statusCode = statusCode;
-        this.isOperationla = true;
+        this.isOperational = true;
         Error.stackTraceLimit(this, this.constructor);
     };
 
@@ -16,6 +16,10 @@ class ApiError extends Error {
 
     static conflict(message = "Conflict") {
         return new ApiError(409, message);
+    }
+
+    static forbidden(message = "forbidden") {
+        return new ApiError(412, message);
     }
 
 }
