@@ -1,6 +1,7 @@
 import { ApiError } from "./../../common/utils/api-error.js"
-import { generateAccessToken, generateRefreshToken, generateResetToken } from "../../common/utils/jwt.utils.js";
+import { generateAccessToken, generateRefreshToken, generateResetToken, verifyRefreshToken } from "../../common/utils/jwt.utils.js";
 import User from "./auth.model.js";
+import { decode, verify } from "jsonwebtoken";
 
 
 const register = async (name, email, password, role) => {
@@ -45,7 +46,7 @@ const login = async ({ email, password }) => {
         throw ApiError.fobidden("please verify your email before login");
     }
 
-    const accessToken = generateAccessToken({ id: user._id });
+    const accessToken = generateAccessToken({ id: user._id, role: user.role });
     const refreshToken = generateRefreshToken({ id: user._id });
 
     user.verificationToken = hashedToken(refreshToken);
@@ -58,6 +59,25 @@ const login = async ({ email, password }) => {
     return { user: userObj, accessToken, refreshToken };
 
 }
+
+const refresh = (token) => {
+    if (!token) throw ApiError.unauthorized("Refresh token missing");
+
+    const decoded = verifyRefreshToken(token);
+
+    const user = await User.findById(decoded.id).select("+refreshToken");
+    if (!user) throw ApiError.unauthorized("user not founded by token");
+
+    if (user.refreshToken !== hashedToken(token))
+        throw ApiError.unauthorized("Invalide Refresh Token");
+
+    const accessToken = generateAccessToken({ id: user._id, role: user.role });
+
+    return { accessToken };
+
+}
+
+
 
 register();
 
