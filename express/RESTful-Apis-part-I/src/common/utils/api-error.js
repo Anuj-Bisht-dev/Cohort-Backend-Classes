@@ -22,6 +22,10 @@ class ApiError extends Error {
         return new ApiError(412, message);
     }
 
+    static notFound(message = "not-found") {
+        return new ApiError(412, message);
+    }
+
 }
 
 export { ApiError }

@@ -33,6 +33,7 @@ const register = async (name, email, password, role) => {
     return userObj;
 }
 
+
 const hashedToken = (token) =>
     crypto.createHash("sha256").update(token).digest("hex");
 
@@ -60,6 +61,7 @@ const login = async ({ email, password }) => {
 
 }
 
+
 const refresh = (token) => {
     if (!token) throw ApiError.unauthorized("Refresh token missing");
 
@@ -78,6 +80,30 @@ const refresh = (token) => {
 }
 
 
+const logout = async (userId) => {
+    // const user = await User.findOne(userId);
+    // if (!user) throw ApiError.unauthorized("user not found");
+
+    // user.refreshToken = undefined;
+    // await user.save({ validateBeforeSave: false });
+
+    await User.findByIdAndUpdate(userId, { refreshToken: undefined }); // done in a single line
+}
+
+
+const forgetPassword = async (email) => {
+    const user = await User.findOne({ email });
+    if (!user) throw ApiError.notFound("user is not found");
+
+    const { rawToken, hashedToken } = generateResetToken();
+
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordToken = Date.now() + 15 * 60 * 1000;
+    await user.save();
+
+}
+
+// resetPasswords
 
 register();
 
