@@ -104,6 +104,13 @@ const forgetPassword = async (email) => {
 }
 
 // resetPasswords
+const resetPasswords = async ({ email, password }, newPassword) => {
+    const user = await User.findOne({ email, password });
+    if (!user) throw ApiError.unauthorized("email or password is Invalide");
+
+    user.password = newPassword;
+    await user.save({ validateBeforeSave: false });
+}
 
 register();
 
