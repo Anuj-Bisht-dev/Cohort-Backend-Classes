@@ -64,7 +64,7 @@ userSchema.pre('save', async function (next) {
 
 // when we don't have any event jsut want to add some basic func (same sa polyphills on js prototypes)
 userSchema.methods.comparePasswords = async function (clearTextpassword) {
-    return await bcrypt.compare(clearTextpassword, this.password); // direct compares donot have to handle salts or anything so it is fast (can be run without await too.)
+    return bcrypt.compare(clearTextpassword, this.password); // direct compares donot have to handle salts or anything so it is fast (can be run without await too.)
 }
 
 export default mongoose.model("User", userSchema);
