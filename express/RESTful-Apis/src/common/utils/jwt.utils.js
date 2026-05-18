@@ -9,7 +9,7 @@ const generateAccessToken = (payload) => {
 
 const verifyAccessToken = (token) => {
     return jwt.verify(token, process.env.JWT_ACSESS_SECRET);
-}
+}   
 
 const generateRefreshToken = (payload) => {
     return jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {

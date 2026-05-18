@@ -28,10 +28,6 @@ interface User {
 class InMemoryDB {
     private _db: Map<UserID, User>
 
-    constructor() {
-
-    }
-
     public insertUser(data: User): UserID {
         if (this._db.has(data.id)) {
             throw new Error(`User with ID ${data.id} already exists`)

@@ -1,19 +1,19 @@
-import "dotenv/config";
-import { app } from "./src/app.js";
+import dotenv from "dotenv"
+import app from "./src/app.js"
 import { connectDB } from "./src/common/config/db.js";
 
 const PORT = process.env.PORT || 5000;
 
 const main = async () => {
+    // connect to db
     await connectDB();
-    // db call connection
 
     app.listen(PORT, () => {
-        console.log(`Server is running on ${process.env.PORT} in ${process.env.NODE_ENV} mode`);
-    });
+        console.log(`server is running on ${PORT} in ${process.env.NODE_ENV} mode`);
+    })
 }
 
 main().catch((error) => {
-    console.log('failed to start server', error);
+    console.log(`Failed to start the server: ${error}`);
     process.exit(1);
 })
