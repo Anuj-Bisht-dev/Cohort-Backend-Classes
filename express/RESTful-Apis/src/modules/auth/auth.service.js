@@ -1,3 +1,4 @@
+import { any } from "joi";
 import { ApiError } from "../../common/utils/api-error.js"
 import { generateAccessToken, generateRefreshToken, verifyAccessToken, generateResetToken, verifyRefreshToken } from "../../common/utils/jwt.utils.js";
 import User from "./auth.model.js";
@@ -115,6 +116,12 @@ const resetPasswords = async ({ email, password }, newPassword) => {
     await user.save({ validateBeforeSave: false });
 }
 
+const getMe = async (userId) => {
+    const user = await User.findById(userId);
+    if (!user) throw ApiError.notFound("user not found");
+    return user;
+}
+
 register();
 
-export { register } 
+export { register, login, refresh, logout, forgetPassword } 
