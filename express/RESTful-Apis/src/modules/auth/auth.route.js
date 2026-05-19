@@ -13,7 +13,6 @@ router.post("/register", validate(RegisterDto), controller.register);
 
 router.post("/login", validate(LoginDto), controller.login); // here calling is imp.
 router.post("logout", authenticate, controller.logout);
-
 router.get("/me", authenticate, controller.getMe); // only passes ref for authenciate when needed passon to user
 
 export { router }
