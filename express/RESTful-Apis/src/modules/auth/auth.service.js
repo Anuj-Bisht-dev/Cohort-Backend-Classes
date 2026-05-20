@@ -3,6 +3,7 @@ import { ApiError } from "../../common/utils/api-error.js"
 import { generateAccessToken, generateRefreshToken, verifyAccessToken, generateResetToken, verifyRefreshToken } from "../../common/utils/jwt.utils.js";
 import User from "./auth.model.js";
 import { decode, verify } from "jsonwebtoken";
+import { sendVerificationEmail } from "../../common/config/mail.js";
 
 
 const register = async (name, email, password, role) => {
@@ -25,6 +26,11 @@ const register = async (name, email, password, role) => {
     });
 
     // TODO: send an email to user with Token: rawToken
+    try {
+        sendVerificationEmail(email, token);
+    } catch (error) {
+        throw ApiError.notFound("email is not found");
+    }
 
     // in case want to delete the any feilds from user then
     const userObj = user.toObject();
@@ -43,8 +49,8 @@ const login = async ({ email, password }) => {
     if (!user) throw new ApiError.unauthorized("unvalide email or password");
 
     // somehow we will check the password
-    const isMatch = user.comparePasswords(password);
-    if (!isMatch) throw ApiError.unauthorized("Invalide eamil or password");
+    const isMatch = await user.comparePasswords(password); // return boolean value
+    if (!isMatch) throw ApiError.unauthorized("Invalide email or password");
 
 
     if (!user.isVerified) {
@@ -107,6 +113,17 @@ const forgetPassword = async (email) => {
 
 }
 
+
+const verifyEmail = async (token) => {
+    const hashedToken = hashedToken(token);
+    const user = await User.findOne({ verificationToken: hashedToken }).select("+verificationToken");
+    if (!user) throw ApiError.notFound("email not found");
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    await user.save();
+    return user;
+}
+
 // resetPasswords
 const resetPasswords = async ({ email, password }, newPassword) => {
     const user = await User.findOne({ email, password });
@@ -115,6 +132,7 @@ const resetPasswords = async ({ email, password }, newPassword) => {
     user.password = newPassword;
     await user.save({ validateBeforeSave: false });
 }
+
 
 const getMe = async (userId) => {
     const user = await User.findById(userId);

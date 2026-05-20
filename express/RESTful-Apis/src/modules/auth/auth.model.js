@@ -1,6 +1,6 @@
 // creating schema
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs"
+import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema({
     // name: String, // or can we written as (on the go validation here)
@@ -55,16 +55,16 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 // the timestamps is a second argument and it automatically create updatedAt & createdAt for the model
 
-// using middlewares for mongoose (user these hooks run for an activity/ events)
+// using middlewares for mongoose (use these hooks run for an activity/ events)
 userSchema.pre('save', async function (next) {
-    if (!this.isModified("password")) return next();
-    this.password = await bcrypt.hash(this.password, 12); // bcrypt.hash takes 2 params first string, second salt (12 is standard but in ruby and rails it's 10), generally it's a heavy task
+    if (!this.isModified("password")) return next(); // If password field can modified(not hashed) then next(). if not then hash.
+    this.password = await bcrypt.hash(this.password, 12); // bcrypt.hash takes 2 params first string, second salt (12 is standard but in ruby and rails it's 10), generally it's a heavy compute. can take default too.
     next();
 });
 
 // when we don't have any event jsut want to add some basic func (same sa polyphills on js prototypes)
 userSchema.methods.comparePasswords = async function (clearTextpassword) {
-    return bcrypt.compare(clearTextpassword, this.password); // direct compares donot have to handle salts or anything so it is fast (can be run without await too.)
+    return bcrypt.compare(clearTextpassword, this.password); // direct compares don't have to manage salts or anything so it is fast (can be run without await too.)
 }
 
 export default mongoose.model("User", userSchema);
