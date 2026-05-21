@@ -1,4 +1,4 @@
-import Joi, { string } from "joi";
+import Joi from "joi";
 import { BaseDto } from "../../../common/dto/base.dto.js";
 
 class RegisterDto extends BaseDto {

@@ -1,6 +1,6 @@
-import { ApiError } from "../../common/utils/api-error";
-import User from "./auth.model"
-import { verifyAccessToken } from "../../common/utils/jwt.utils";
+import { ApiError } from "../../common/utils/api-error.js";
+import User from "./auth.model.js"
+import { verifyAccessToken } from "../../common/utils/jwt.utils.js";
 
 const authenticate = async (req, res, next) => {
 
@@ -16,7 +16,7 @@ const authenticate = async (req, res, next) => {
     if (!user) throw ApiError.unauthorized("user no longer exists");
 
     // added user property
-    req.user = { 
+    req.user = {
         id: user._id,
         role: user.role,
         name: user.name,
@@ -26,7 +26,7 @@ const authenticate = async (req, res, next) => {
 }
 
 const authorize = (...roles) => {
-    return (req, res, next) => {    
+    return (req, res, next) => {
         if (roles.includes(req.user.role)) {
             throw ApiError.forbidden("you don't have permission to perform this action");
         }

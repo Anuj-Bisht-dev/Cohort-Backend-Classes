@@ -1,8 +1,7 @@
-import { any } from "joi";
 import { ApiError } from "../../common/utils/api-error.js"
 import { generateAccessToken, generateRefreshToken, verifyAccessToken, generateResetToken, verifyRefreshToken } from "../../common/utils/jwt.utils.js";
 import User from "./auth.model.js";
-import { decode, verify } from "jsonwebtoken";
+import { decode } from "jsonwebtoken";
 import { sendVerificationEmail } from "../../common/config/mail.js";
 
 
@@ -46,7 +45,7 @@ const hashedToken = (token) =>
 
 const login = async ({ email, password }) => {
     const user = await User.findOne({ email }).select("+password");
-    if (!user) throw new ApiError.unauthorized("unvalide email or password");
+    if (!user) throw new ApiError.unauthorized("Invalide email or password");
 
     // somehow we will check the password
     const isMatch = await user.comparePasswords(password); // return boolean value
@@ -72,7 +71,7 @@ const login = async ({ email, password }) => {
 }
 
 
-const refresh = (token) => {
+const refresh = async (token) => {
     if (!token) throw ApiError.unauthorized("Refresh token missing");
 
     const decoded = verifyRefreshToken(token);
@@ -115,8 +114,8 @@ const forgetPassword = async (email) => {
 
 
 const verifyEmail = async (token) => {
-    const hashedToken = hashedToken(token);
-    const user = await User.findOne({ verificationToken: hashedToken }).select("+verificationToken");
+    const hashToken = hashedToken(token);
+    const user = await User.findOne({ verificationToken: hashToken }).select("+verificationToken");
     if (!user) throw ApiError.notFound("email not found");
     user.isVerified = true;
     user.verificationToken = undefined;

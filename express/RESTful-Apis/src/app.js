@@ -1,7 +1,12 @@
 import cookieParser from "cookie-parser";
-import express from "express";
+import express, { json } from "express";
+import * as authRoute from "./modules/auth/auth.route.js"
 
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-export { app };
+app.use("/get", authRoute);
+
+export default app;
