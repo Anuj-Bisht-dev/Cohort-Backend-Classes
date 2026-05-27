@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
         default: "customer", // always required default value while using emuns
     },
     isVerified: {
-        type: String,
+        type: Boolean,
         default: false,
     },
     verificationToken: {
@@ -48,7 +48,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         select: false,
     },
-    selectPasswordExpires: {
+    resetPasswordExpires: {
         type: Date,
         select: false,
     },
@@ -56,10 +56,9 @@ const userSchema = new mongoose.Schema({
 // the timestamps is a second argument and it automatically create updatedAt & createdAt for the model
 
 // using middlewares/hooks for mongoose (hook that runs for an activity/events)
-userSchema.pre('save', async function (next) {
-    if (!this.isModified("password")) return next(); // If password field cannot modified(already hashed) then next() if not then hash.
+userSchema.pre('save', async function () {
+    if (!this.isModified("password")) return; // If password field cannot modified(already hashed) then return nothing if not then hash.
     this.password = await bcrypt.hash(this.password, 12); // bcrypt.hash takes 2 params first string, second salt (12 is standard but in ruby and rails it's 10), generally it's a heavy compute. can take default too.
-    next();
 });
 
 // when we don't have any event jsut want to add some basic func (same sa polyphills on js prototypes)

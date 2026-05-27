@@ -12,7 +12,6 @@ const authenticate = async (req, res, next) => {
 
     const decoded = verifyAccessToken(token);
     const user = await User.findById(decoded.id);
-
     if (!user) throw ApiError.unauthorized("user no longer exists");
 
     // added user property
