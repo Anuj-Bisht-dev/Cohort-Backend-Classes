@@ -1,2 +1,17 @@
 services:
-  
+  postgresdb:
+    image: postgres:17
+
+    ports:
+      - "5432:5432"
+
+    environment:
+      POSTGRES_USER: anuj
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres_auth
+
+    volumes:
+      - 'postgres_data:/var/lib/postgresql/data'
+
+volumes:
+  postgres_data:

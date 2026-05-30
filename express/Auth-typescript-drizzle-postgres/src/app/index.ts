@@ -13,7 +13,13 @@ function createExpressApplication (){
         });
     });
 
+    app.get("/health", (req, res)=>{
+        return res.json({
+            message: "health is upto date now"
+        }) 
+    });
+
     return app;
-}
+    }
 
 export {createExpressApplication}
