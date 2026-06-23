@@ -8,7 +8,7 @@ const main = () => {
     const server = createServer(createExpressApp());
     const PORT: number = 5000;
 
-    server.listen(PORT, () => {
+    server.listen(PORT, async () => {
       console.log(
         `HTTP server is running in ${process.env.PROCESS} enviornment with PORT: ${PORT}`
       );
