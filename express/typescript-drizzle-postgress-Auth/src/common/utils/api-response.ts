@@ -1,7 +1,7 @@
 import { Response } from "express";
 
 class ApiResponse {
-  static ok(res: Response, message = "ok", data = null) {
+  static ok(res: Response, message: string = "ok", data: any = null) {
     return res.status(200).json({
       message,
       data,
@@ -10,7 +10,7 @@ class ApiResponse {
 
   static created(
     res: Response,
-    message = "successfully created",
+    message: string = "successfully created",
     data: any = null
   ) {
     return res.status(201).json({
