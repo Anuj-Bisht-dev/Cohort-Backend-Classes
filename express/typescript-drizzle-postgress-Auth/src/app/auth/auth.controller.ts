@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import {
   forgetPasswordModel,
+  signOutModel,
   signinPayloadModel,
   signupPayloadModel,
 } from "./auth.model";
@@ -9,7 +10,13 @@ import { db } from "../../common/db";
 import { userTable } from "../../common/db/schema";
 import { eq } from "drizzle-orm";
 import ApiResponse from "../../common/utils/api-response";
-import { generateHashToken } from "../../common/utils/token.utils";
+import {
+  generateAccessToken,
+  verifyAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+  generateHashToken,
+} from "../../common/utils/token.utils";
 
 class AuthenticationControllers {
   public async handleSignup(req: Request, res: Response) {
@@ -77,29 +84,39 @@ class AuthenticationControllers {
       throw ApiError.badRequest("invalide email or password");
 
     // TODO: create tokens access and refresh
+    const accessToken = generateAccessToken({ id: user.id });
+    const refreshToken = generateRefreshToken({ id: user.id });
 
-    return ApiResponse.ok(res, "User logged In successfully", {token: 1});
+    await db
+      .update(userTable)
+      .set({ refreshToken: refreshToken })
+      .where(eq(userTable.email, email));
+
+    return ApiResponse.ok(res, "User logged In successfully", {
+      accessToken,
+      refreshToken,
+    });
   }
 
-  public async handleForgetPassword(req: Request, res: Response) {
-    const verifyForgetPassword = await forgetPasswordModel.safeParseAsync(
-      req.body
-    );
-    if (verifyForgetPassword.error)
-      throw ApiError.badRequest("empty email parameter");
+  public async handleSignOut(req: Request, res: Response) {
+    const user = await signOutModel.safeParseAsync(req.body);
+    if (user.error) throw ApiError.badRequest("email is missing");
 
-    const { email } = verifyForgetPassword.data;
-
-    const user = await db
+    const { email } = user.data;
+    const userEmail = await db
       .select()
       .from(userTable)
       .where(eq(userTable.email, email));
-    if (!user) throw ApiError.unauthorized("user is not authorized");
 
+    if (!userEmail) throw ApiError.unauthorized(`email ${email} not exists`);
 
+    await db
+      .update(userTable)
+      .set({ refreshToken: null })
+      .where(eq(userTable.email, email));
+
+    return ApiResponse.ok(res, "user logged out successfully");
   }
-
-  public async handleResetPassword(req: Request, res: Response) {}
 }
 
 export default AuthenticationControllers;

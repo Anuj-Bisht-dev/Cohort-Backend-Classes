@@ -8,6 +8,13 @@
       "when": 1782221658786,
       "tag": "0000_real_forgotten_one",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1782494661651,
+      "tag": "0001_ambitious_whizzer",
+      "breakpoints": true
     }
   ]
 }

@@ -19,6 +19,8 @@ export const userTable = pgTable("users", {
   password: varchar("password", { length: 66 }),
   salt: text("salt"),
 
+  refreshToken: varchar("refresh_token").unique(),
+
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").$onUpdate(() => new Date()),
 });
