@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import {
   forgetPasswordModel,
+  resetPasswordModel,
   signOutModel,
   signinPayloadModel,
   signupPayloadModel,
@@ -8,8 +9,9 @@ import {
 import ApiError from "../../common/utils/api-error";
 import { db } from "../../common/db";
 import { userTable } from "../../common/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq, gt } from "drizzle-orm";
 import ApiResponse from "../../common/utils/api-response";
+import crypto from "crypto";
 import {
   generateAccessToken,
   verifyAccessToken,
@@ -17,6 +19,10 @@ import {
   verifyRefreshToken,
   generateHashToken,
 } from "../../common/utils/token.utils";
+
+const hashToken = (token: string): string => {
+  return crypto.createHash("sha256").update(token).digest("hex");
+};
 
 class AuthenticationControllers {
   public async handleSignup(req: Request, res: Response) {
@@ -116,6 +122,70 @@ class AuthenticationControllers {
       .where(eq(userTable.email, email));
 
     return ApiResponse.ok(res, "user logged out successfully");
+  }
+
+  public async handleForgetPassword(req: Request, res: Response) {
+    const verifyForgetPassword = await forgetPasswordModel.safeParseAsync(
+      req.body
+    );
+    if (verifyForgetPassword.error)
+      throw ApiError.badRequest("enter valide email");
+
+    const { email } = verifyForgetPassword.data;
+
+    const user = await db
+      .select()
+      .from(userTable)
+      .where(eq(userTable.email, email));
+    if (!user) throw ApiError.unauthorized("user is not authorized");
+
+    const token = generateHashToken().salt;
+    const hashedToken: string = hashToken(token);
+    const verificationTokenExpiresIn = new Date(Date.now() * 15 * 60 * 1000);
+    db.update(userTable)
+      .set({
+        verificationToken: hashedToken,
+        verificationTokenExpiresIn: verificationTokenExpiresIn,
+      })
+      .where(eq(userTable.email, email));
+
+    // send token in email to user
+  }
+
+  public async handleResetPassword(req: Request, res: Response) {
+    const user = await resetPasswordModel.safeParseAsync(
+      req.query.token,
+      req.body
+    );
+    if (user.error) throw ApiError.badRequest("token or password is missing");
+    const { token, newPassword } = user.data;
+
+    const tokenVerification = await db
+      .select()
+      .from(userTable)
+      .where(
+        and(
+          eq(userTable.verificationToken, token),
+          gt(userTable.verificationTokenExpiresIn, new Date()) // checks the date inside the drizzle itself
+        )
+      );
+    if (!tokenVerification) throw ApiError.unauthorized("session time expires");
+
+    const salt = generateHashToken().salt;
+    const newHashedPassword = generateHashToken().hashedToken(
+      newPassword,
+      salt
+    );
+
+    db.update(userTable)
+      .set({
+        password: newHashedPassword,
+        verificationToken: null,
+        verificationTokenExpiresIn: null,
+      })
+      .where(eq(userTable.verificationToken, hashToken(token)));
+
+    return ApiResponse.ok(res, "password has changed successfully");
   }
 }
 

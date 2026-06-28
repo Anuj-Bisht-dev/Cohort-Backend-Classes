@@ -19,4 +19,14 @@ authRouter.post(
   authenticationController.handleSignOut.bind(authenticationController)
 );
 
+authRouter.post(
+  "/forgot-password",
+  authenticationController.handleForgetPassword.bind(authenticationController)
+);
+
+authRouter.post(
+  "/reset-password/:token",
+  authenticationController.handleResetPassword.bind(authenticationController)
+);
+
 export default authRouter;

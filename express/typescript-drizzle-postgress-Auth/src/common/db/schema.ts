@@ -21,6 +21,9 @@ export const userTable = pgTable("users", {
 
   refreshToken: varchar("refresh_token").unique(),
 
+  verificationToken: varchar("verification_token").unique(),
+  verificationTokenExpiresIn: timestamp('verification_token_expires_in'),
+
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").$onUpdate(() => new Date()),
 });

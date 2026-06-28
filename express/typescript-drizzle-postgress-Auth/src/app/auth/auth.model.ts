@@ -12,6 +12,14 @@ export const signinPayloadModel = z.object({
   password: z.string().min(8).max(66),
 });
 
+export const forgetPasswordModel = z.object({
+  email: email().max(322).lowercase().trim(),
+});
+
+export const resetPasswordModel = z.object({
+  token: z.string(),
+  newPassword: z.string().min(8).max(66),
+});
 
 export const signOutModel = z.object({
   email: email().max(322).lowercase().trim(),
