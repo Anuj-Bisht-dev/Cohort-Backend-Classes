@@ -25,7 +25,7 @@ authRouter.post(
 );
 
 authRouter.post(
-  "/reset-password/:token",
+  "/reset-password",
   authenticationController.handleResetPassword.bind(authenticationController)
 );
 

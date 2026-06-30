@@ -7,6 +7,10 @@ export const signupPayloadModel = z.object({
   password: z.string().min(8).max(66),
 });
 
+export const emailVerifiedModel = z.object({
+  token: z.string().trim(),
+});
+
 export const signinPayloadModel = z.object({
   email: email().max(322).lowercase(),
   password: z.string().min(8).max(66),

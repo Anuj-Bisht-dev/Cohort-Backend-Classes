@@ -4,6 +4,7 @@ import {
   resetPasswordModel,
   signOutModel,
   signinPayloadModel,
+  emailVerifiedModel,
   signupPayloadModel,
 } from "./auth.model";
 import ApiError from "../../common/utils/api-error";
@@ -45,7 +46,11 @@ class AuthenticationControllers {
       throw ApiError.badRequest("duplicate Entry: users email already exists");
 
     const salt = generateHashToken().salt;
-    const hashToken = generateHashToken().hashedToken(password, salt);
+    const hashPassword = generateHashToken().hashedToken(password, salt);
+
+    const verificationToken = generateHashToken().salt;
+    const hashedVerificationToken = hashToken(verificationToken);
+    const tokenExpiresIn = new Date(Date.now() * 15 * 60 * 1000);
 
     const result = await db
       .insert(userTable)
@@ -53,16 +58,46 @@ class AuthenticationControllers {
         firstName,
         lastName,
         email,
-        password: hashToken,
+        password: hashPassword,
         salt,
+        verificationToken: hashedVerificationToken,
+        verificationTokenExpiresIn: tokenExpiresIn,
       })
       .returning({ id: userTable.id });
+
+    // send token to verify users email
 
     return ApiResponse.created(
       res,
       "user has been created successfully",
       result
     );
+  }
+
+  public async handleVerifyEmail(req: Request, res: Response) {
+    const user = await emailVerifiedModel.safeParseAsync(req.query.token);
+    if (user.error) throw ApiError.badRequest("token is not valide");
+
+    const { token } = user.data;
+
+    const usersToken = await db
+      .select()
+      .from(userTable)
+      .where(
+        and(
+          eq(userTable.verificationToken, hashToken(token)),
+          gt(userTable.verificationTokenExpiresIn, new Date())
+        )
+      );
+    if (!usersToken)
+      throw ApiError.unauthorized("session timeout verify again");
+
+    const result = await db
+      .update(userTable)
+      .set({ verifyEmail: true })
+      .where(eq(userTable.verificationToken, token))
+      .returning({ id: userTable.id });
+    return ApiResponse.ok(res, "verifed users email", result);
   }
 
   public async handelSignin(req: Request, res: Response) {
@@ -150,6 +185,7 @@ class AuthenticationControllers {
       .where(eq(userTable.email, email));
 
     // send token in email to user
+    return ApiResponse.ok(res, "email sent successfully to user's email");
   }
 
   public async handleResetPassword(req: Request, res: Response) {
