@@ -18,7 +18,7 @@ router.post("/logout", authenticate, controller.logout);
 router.post("/refresh-token", controller.refreshToken);
 router.post("/forgot-password", validate(ForgotPassword), controller.forgetPassword);
 router.post("/verify-email/:token", controller.verifyEmail);
-router.post("/reset-password:token", validate(ResetPassword), controller.resetPassword);
-router.get("/getMe", authenticate, controller.getMe); // only passes ref for authenciate when needed passon to user
+router.post("/reset-password/:token", validate(ResetPassword), controller.resetPassword);
+router.get("/getMe", authenticate, controller.getMe); // only passes ref for authenciate when needed pass-on to user
 
 export default router;

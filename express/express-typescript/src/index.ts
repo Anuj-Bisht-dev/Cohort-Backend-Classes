@@ -7,7 +7,7 @@ import { createServerApplication } from './app/index.js';
 async function main() {
     try {
         const server = http.createServer(createServerApplication());
-        const PORT: number = env.PORT ? +env.PORT : 8080;
+        const PORT: number=  env.PORT ? +env.PORT : 8080;
         
         server.listen(PORT, () => {
             console.log("🔥 this is the real file Running");
@@ -20,4 +20,4 @@ async function main() {
 
 //#endregion  //*======== server ===========
 
-main()
+main();

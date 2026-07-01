@@ -6,7 +6,7 @@ import {
     generateResetToken,
     verifyRefreshToken
 } from "../../common/utils/jwt.utils.js";
-import User from "./auth.model.js";
+import User from "./auth.model.js"; 
 import { decode } from "jsonwebtoken";
 import { sendVerificationEmail } from "../../common/config/mail.js";
 
@@ -38,8 +38,8 @@ const register = async ({ name, email, password, role }) => {
         throw ApiError.notFound("email sending failed");
     }
 
-    // in case want to delete the any feilds from user then.
-    const userObj = user.toObject();
+    // In case want to delete any feilds from user then.
+    const userObj = user.toObject();    
     delete userObj.password;
     delete userObj.verificationToken;
 

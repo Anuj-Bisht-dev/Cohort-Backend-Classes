@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 const userSchema = new mongoose.Schema({
     // name: String, // or can we written as (on the go validation here)
     name: {
-        type: String,
+        type: String,   
         trim: true,
         minlength: 2,
         maxlength: 200,

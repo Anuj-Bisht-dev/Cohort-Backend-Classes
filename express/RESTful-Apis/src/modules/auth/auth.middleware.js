@@ -26,7 +26,7 @@ const authenticate = async (req, res, next) => {
 
 const authorize = (...roles) => {
     return (req, res, next) => {
-        if (roles.includes(req.user.role)) {
+        if (!roles.includes(req.user.role)) {
             throw ApiError.forbidden("you don't have permission to perform this action");
         }
         next();

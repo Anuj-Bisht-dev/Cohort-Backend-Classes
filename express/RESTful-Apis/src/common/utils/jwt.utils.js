@@ -21,6 +21,7 @@ const verifyRefreshToken = (token) => {
     return jwt.verify(token, process.env.JWT_REFRESH_SECRET);
 }
 
+// uses this for verifying emails
 const generateResetToken = () => {
     const rawToken = crypto.randomBytes(32).toString("hex");
     const hashedToken = crypto

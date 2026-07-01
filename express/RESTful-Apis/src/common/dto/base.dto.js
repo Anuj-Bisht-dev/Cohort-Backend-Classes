@@ -2,7 +2,7 @@ import Joi from "joi";
 
 class BaseDto {
     static schema = Joi.object({}); // this is created as empty obj we expect when user will use schema then it will overwrite this
-
+    
     static validate(data) {
         const { error, value } = this.schema.validate(data, {
             abortEarly: false, // it stop the req when the first err hits. by default its value is true 
